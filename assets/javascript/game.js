@@ -16,7 +16,7 @@ this.masked_answer = getMaskedAnswer(answer);
 var correctGuessArray = [];
 var incorrectGuessArray = [];
 var playGame = false;
-var questions = [];
+var questionPool = [];
 
 var win = false;
 var numRemainingGuesses = 3;
@@ -40,13 +40,13 @@ function getMaskedAnswer(answerToConvert){
 
 }
 function getQuestionPool(answerPool){
-	var questions = [];
+	var questionPool = [];
 	for(var i = 0; i < answerPool.length; i++){		
-		questions.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
+		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
 		}
-		console.log(questions);
+		console.log(questionPool);
 
-		return questions;
+		return questionPool;
 }
 
 function gameStart(){
@@ -54,8 +54,8 @@ function gameStart(){
 		console.log("play game!");			
 		mainContentRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
-		questions = getQuestionPool(answerPool);
-		nextQuestion();
+		questionPool = getQuestionPool(answerPool);
+		currentQuestion = nextQuestion();
 }
 
 //Prep the first round or start the next round
@@ -66,18 +66,19 @@ function gameStart(){
 //Add next question to previousQuestions
 //
 function nextQuestion(){
-	if(questions.length === 0){
+	if(questionPool.length === 0){
 		console.log("regen pool");
-		questions = getQuestionPool(answerPool);
+		questionPool = getQuestionPool(answerPool);
 	}
 
 	numRemainingGuesses = 3;
 	correctGuessArray = [];
 	incorrectGuessArray = [];
-	currentQuestion = questions[Math.floor(Math.random()*questions.length)];
-	questions.splice(questions.indexOf(currentQuestion),1);
-	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questions.length);
+	var currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
+	questionPool.splice(questionPool.indexOf(currentQuestion),1);
+	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questionPool.length);
 	
+	return currentQuestion;
 }
 
 //Actually do stuff
@@ -102,7 +103,7 @@ var selection = String(event.key).toLowerCase();
  	if(currentQuestion.masked_answer.join("") === currentQuestion.answer){
 
  		console.log("YOU WIN!");
- 		nextQuestion();
+ 		currentQuestion = nextQuestion();
  	}
 
  }
@@ -118,7 +119,7 @@ else
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
  		console.log("The answer was: " + currentQuestion.answer);
- 		nextQuestion();
+ 		currentQuestion = nextQuestion();
  	}
  }
 }
