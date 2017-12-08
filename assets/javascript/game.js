@@ -90,7 +90,7 @@ var selection = String(event.key).toLowerCase();
 
 //console.log("User Chose: " + selection);
 
-  if(currentQuestion.answer.includes(selection) && correctGuessArray.indexOf(selection) === -1 && incorrectGuessArray.indexOf(selection) === -1){
+  if(currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection)){
   	//sorry Oleg ;)
 	for(var k = 0; k < currentQuestion.answer.length; k++){
 		currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection;
@@ -107,7 +107,7 @@ var selection = String(event.key).toLowerCase();
  	}
 
  }
- else if(correctGuessArray.indexOf(selection) >= 0 || incorrectGuessArray.indexOf(selection) >=0){
+ else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
  	console.log("DUPE GUESS: " + selection);
  }
 
