@@ -6,19 +6,6 @@ var answerPool = ["binturong","platypus","wombat"];
 var imagePool = ["binturong.jpg","Platypus.jpg", "Wombat.jpg"];
 var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate"];
 
-var correctGuessArray = [];
-var incorrectGuessArray = [];
-var playGame = false;
-var questions = [];
-var win = false;
-var numRemainingGuesses = 3;
-var currentQuestion;
-var previousQuestions = [];
-
-
-var mainContentRow = document.getElementById("main-game-area");
-var playQuitButton = document.getElementById("play-now");
-var hintImage = document.getElementById("hint-image");
 var Question = function(imageUrl,hintText,answer){
 this.imageURL = imageUrl;
 this.hintText = hintText;
@@ -26,9 +13,23 @@ this.answer = answer;
 this.masked_answer = getMaskedAnswer(answer);
 };
 
+var correctGuessArray = [];
+var incorrectGuessArray = [];
+var playGame = false;
+var questions = [];
+
+var win = false;
+var numRemainingGuesses = 3;
+var currentQuestion;
+
+
+var mainContentRow = document.getElementById("main-game-area");
+var playQuitButton = document.getElementById("play-now");
+var hintImage = document.getElementById("hint-image");
+
+
 
 function getMaskedAnswer(answerToConvert){
-
 	var masked_answer = []; 
 	for(var q = 0; q < answerToConvert.length;q++){
 		
@@ -38,69 +39,51 @@ function getMaskedAnswer(answerToConvert){
 	return masked_answer;
 
 }
-function initializeQuestionArray(){
+function getQuestionPool(answerPool){
+	var questions = [];
 	for(var i = 0; i < answerPool.length; i++){		
-		questions.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
-
+		questions.push(new Question(imagePool[i],hintPool[i],answerPool[i],i));
 		}
+		console.log(questions);
 
-		console.log(questions);	
+		return questions;
 }
 
 function gameStart(){
-	if(playGame){
+		playGame = true;
 		console.log("play game!");			
 		mainContentRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
-		initializeQuestionArray();
+		questions = getQuestionPool(answerPool);
 		nextQuestion();
-	}
-	
 }
 
+//Prep the first round or start the next round
+//Reset or Set Guesses
+//Clear correctGuessArray
+//Clear incorrrectGuessArray
+//Set next question
+//Add next question to previousQuestions
+//
 function nextQuestion(){
+	if(questions.length === 0){
+		console.log("regen pool");
+		questions = getQuestionPool(answerPool);
+	}
 
-	
+	numRemainingGuesses = 3;
 	correctGuessArray = [];
 	incorrectGuessArray = [];
 	currentQuestion = questions[Math.floor(Math.random()*questions.length)];
-	numRemainingGuesses = 3;
+	questions.splice(questions.indexOf(currentQuestion),1);
+	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questions.length);
+	
 }
 
-function setPlayGame(){
-	if(playGame){
-		playGame = false;
-		
-	}
-	else{	
-		playGame = true;
-		gameStart();
-		
-		
-
-	}
-};
-
-//Main stuff
-//javascript is ugly
-
-
-
-
-
-
-
-//console.log("User Chose: " + selection);
-
-
-	
-
-
+//Actually do stuff
 document.onkeypress = function(){
 
 if(playGame){
-
-
 
 var selection = String(event.key).toLowerCase();
 
@@ -111,6 +94,7 @@ var selection = String(event.key).toLowerCase();
 	for(var k = 0; k < currentQuestion.answer.length; k++){
 		currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection;
 	 }
+
 	correctGuessArray.push(selection);	
 	console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
  	console.log("Masked answer: " + currentQuestion.masked_answer);
@@ -126,7 +110,6 @@ var selection = String(event.key).toLowerCase();
  	console.log("DUPE GUESS: " + selection);
  }
 
-
 else
  {
  	incorrectGuessArray.push(selection);
@@ -134,17 +117,10 @@ else
  	numRemainingGuesses--;
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
+ 		console.log("The answer was: " + currentQuestion.answer);
  		nextQuestion();
-
  	}
  }
-
-
- 
-
-
-
-
 }
 }
 
