@@ -42,7 +42,7 @@ function getMaskedAnswer(answerToConvert){
 function getQuestionPool(answerPool){
 	var questions = [];
 	for(var i = 0; i < answerPool.length; i++){		
-		questions.push(new Question(imagePool[i],hintPool[i],answerPool[i],i));
+		questions.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
 		}
 		console.log(questions);
 
