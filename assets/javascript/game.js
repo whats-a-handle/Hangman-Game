@@ -58,24 +58,19 @@ function gameStart(){
 		currentQuestion = nextQuestion();
 }
 
-//Prep the first round or start the next round
-//Reset or Set Guesses
-//Clear correctGuessArray
-//Clear incorrrectGuessArray
-//Set next question
-//Add next question to previousQuestions
-//
+
 function nextQuestion(){
-	if(questionPool.length === 0){
+	
+	if(questionPool.length < 1){
 		console.log("regen pool");
 		questionPool = getQuestionPool(answerPool);
 	}
 
-	numRemainingGuesses = 3;
+	numRemainingGuesses = 3; //3 guesses for quick testing
 	correctGuessArray = [];
 	incorrectGuessArray = [];
 	var currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
-	questionPool.splice(questionPool.indexOf(currentQuestion),1);
+	questionPool.splice(questionPool.indexOf(currentQuestion),1); //remove the current question from the question pool to prevent dupes
 	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questionPool.length);
 	
 	return currentQuestion;
@@ -88,12 +83,13 @@ if(playGame){
 
 var selection = String(event.key).toLowerCase();
 
-//console.log("User Chose: " + selection);
 
   if(currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection)){
-  	//sorry Oleg ;)
+
 	for(var k = 0; k < currentQuestion.answer.length; k++){
-		currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection;
+		currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
+		//Finds the next instance of selection by using the iterator k as an index offset which is inclusive of index[k]
+		//Replaces underscores within masked_array by finding the location of selection within currentQuestion.answer string 	
 	 }
 
 	correctGuessArray.push(selection);	
