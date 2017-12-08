@@ -48,7 +48,7 @@ function getQuestionPool(answerPool){
 
 		return questionPool;
 }
-
+//Called when user presses "Play Game" button on page
 function gameStart(){
 		playGame = true;
 		console.log("play game!");			
