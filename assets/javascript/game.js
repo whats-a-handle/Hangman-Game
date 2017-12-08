@@ -3,7 +3,7 @@ console.log("hello!");
 
 
 var answerPool = ["binturong","platypus","wombat"];
-var imagePool = ["binturong.jpg","Platypus.jpg", "Wombat.jpg"];
+var imagePool = ["binturong.jpg","platypus.jpg", "wombat.jpg"];
 var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate"];
 
 var Question = function(imageUrl,hintText,answer){
@@ -60,7 +60,7 @@ function gameStart(){
 
 
 function nextQuestion(){
-	
+
 	if(questionPool.length < 1){
 		console.log("regen pool");
 		questionPool = getQuestionPool(answerPool);
