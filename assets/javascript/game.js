@@ -3,7 +3,7 @@ console.log("hello!");
 
 
 var answerPool = ["binturong","platypus","wombat"];
-var imagePool = ["binturong.jpg","platypus.jpg", "wombat.jpg"];
+var imagePool = ["./assets/images/binturong.jpg","./assets/images/platypus.jpg", "./assets/images/wombat.jpg"];
 var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate"];
 
 var Question = function(imageUrl,hintText,answer){
@@ -23,11 +23,11 @@ var numRemainingGuesses = 3;
 var currentQuestion;
 
 
-var mainContentRow = document.getElementById("main-game-area");
-var playQuitButton = document.getElementById("play-now");
-var hintImage = document.getElementById("hint-image");
-
-
+var mainContentRow = document.getElementsByClassName("main-row")[0];
+var playQuitButton = document.getElementsByClassName("play-button")[0];
+var currentHintImage = document.getElementsByClassName("hint-image")[0];
+var currentHintText = document.getElementsByClassName("hint-text")[0];
+var currentMaskedText = document.getElementsByClassName("masked-text")[0];
 
 function getMaskedAnswer(answerToConvert){
 	var masked_answer = []; 
@@ -72,7 +72,11 @@ function nextQuestion(){
 	var currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
 	questionPool.splice(questionPool.indexOf(currentQuestion),1); //remove the current question from the question pool to prevent dupes
 	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questionPool.length);
-	
+
+	currentHintText.textContent = currentQuestion.hintText;
+	currentHintImage.src = currentQuestion.imageURL;
+	currentMaskedText.textContent = currentQuestion.masked_answer;
+
 	return currentQuestion;
 }
 
@@ -84,12 +88,22 @@ if(playGame){
 var selection = String(event.key).toLowerCase();
 
 
+
+
   if(currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection)){
 
 	for(var k = 0; k < currentQuestion.answer.length; k++){
-		currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
-		//Finds the next instance of selection by using the iterator k as an index offset which is inclusive of index[k]
-		//Replaces underscores within masked_array by finding the location of selection within currentQuestion.answer string 	
+
+		if(currentQuestion.answer[k] === selection){
+
+			currentQuestion.masked_answer[k] = selection;
+
+		}
+		//LOL below was unnecessary but sure looks nice. This for loop does the same.
+		//Unnecssary because we're already looping through for every element. Don't know which would be faster, but for loop easier to read
+			//currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
+				//Finds the next instance of selection by using the iterator k as an index offset which is inclusive of index[k]
+				//Replaces underscores within masked_array by finding the location of selection within currentQuestion.answer string 	
 	 }
 
 	correctGuessArray.push(selection);	
@@ -101,7 +115,7 @@ var selection = String(event.key).toLowerCase();
  		console.log("YOU WIN!");
  		currentQuestion = nextQuestion();
  	}
-
+ 		currentMaskedText.textContent = currentQuestion.masked_answer;
  }
  else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
  	console.log("DUPE GUESS: " + selection);
