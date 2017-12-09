@@ -10,7 +10,7 @@ var Question = function(imageUrl,hintText,answer){
 this.imageURL = imageUrl;
 this.hintText = hintText;
 this.answer = answer;
-this.masked_answer = getMaskedAnswer(answer);
+this.maskedAnswer = getMaskedAnswer(answer);
 };
 
 var correctGuessArray = [];
@@ -30,13 +30,13 @@ var currentHintText = document.getElementsByClassName("hint-text")[0];
 var currentMaskedText = document.getElementsByClassName("masked-text")[0];
 
 function getMaskedAnswer(answerToConvert){
-	var masked_answer = []; 
+	var maskedAnswer = []; 
 	for(var q = 0; q < answerToConvert.length;q++){
 		
-		masked_answer.push("_");
+		maskedAnswer.push("_");
 	}
 
-	return masked_answer;
+	return maskedAnswer;
 
 }
 function getQuestionPool(answerPool){
@@ -64,6 +64,7 @@ function nextQuestion(){
 	if(questionPool.length < 1){
 		console.log("regen pool");
 		questionPool = getQuestionPool(answerPool);
+		
 	}
 
 	numRemainingGuesses = 3; //3 guesses for quick testing
@@ -72,10 +73,11 @@ function nextQuestion(){
 	var currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
 	questionPool.splice(questionPool.indexOf(currentQuestion),1); //remove the current question from the question pool to prevent dupes
 	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questionPool.length);
-
+	//Show values of current question
+	//Clean up later
 	currentHintText.textContent = currentQuestion.hintText;
 	currentHintImage.src = currentQuestion.imageURL;
-	currentMaskedText.textContent = currentQuestion.masked_answer;
+	currentMaskedText.textContent = currentQuestion.maskedAnswer;
 
 	return currentQuestion;
 }
@@ -96,26 +98,28 @@ var selection = String(event.key).toLowerCase();
 
 		if(currentQuestion.answer[k] === selection){
 
-			currentQuestion.masked_answer[k] = selection;
+			currentQuestion.maskedAnswer[k] = selection;
 
 		}
 		//LOL below was unnecessary but sure looks nice. This for loop does the same.
 		//Unnecssary because we're already looping through for every element. Don't know which would be faster, but for loop easier to read
-			//currentQuestion.masked_answer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
+			//currentQuestion.maskedAnswer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
 				//Finds the next instance of selection by using the iterator k as an index offset which is inclusive of index[k]
 				//Replaces underscores within masked_array by finding the location of selection within currentQuestion.answer string 	
 	 }
 
 	correctGuessArray.push(selection);	
 	console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
- 	console.log("Masked answer: " + currentQuestion.masked_answer);
+ 	console.log("Masked answer: " + currentQuestion.maskedAnswer);
 
- 	if(currentQuestion.masked_answer.join("") === currentQuestion.answer){
+ 	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
 
  		console.log("YOU WIN!");
  		currentQuestion = nextQuestion();
  	}
- 		currentMaskedText.textContent = currentQuestion.masked_answer;
+ 		//Show update value of current question
+ 		//Maybe roll this and the above if statement into a function
+ 		currentMaskedText.textContent = currentQuestion.maskedAnswer;
  }
  else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
  	console.log("DUPE GUESS: " + selection);
