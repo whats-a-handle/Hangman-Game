@@ -2,8 +2,10 @@
 console.log("hello!");
 
 
+
+
 var answerPool = ["binturong","platypus","wombat"];
-var imagePool = ["./assets/images/binturong.jpg","./assets/images/platypus.jpg", "./assets/images/wombat.jpg"];
+var imagePool = ["binturong.jpg","platypus.jpg", "wombat.jpg"];
 var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate"];
 
 var Question = function(imageUrl,hintText,answer){
@@ -17,11 +19,9 @@ var correctGuessArray = [];
 var incorrectGuessArray = [];
 var playGame = false;
 var questionPool = [];
-
 var win = false;
 var numRemainingGuesses = 3;
 var currentQuestion;
-
 
 var mainContentRow = document.getElementsByClassName("main-row")[0];
 var playQuitButton = document.getElementsByClassName("play-button")[0];
@@ -29,6 +29,7 @@ var currentHintImage = document.getElementsByClassName("hint-image")[0];
 var currentHintText = document.getElementsByClassName("hint-text")[0];
 var currentMaskedText = document.getElementsByClassName("masked-text")[0];
 
+//"converts" our answer's length into an array of underscores for guessing
 function getMaskedAnswer(answerToConvert){
 	var maskedAnswer = []; 
 	for(var q = 0; q < answerToConvert.length;q++){
@@ -39,7 +40,9 @@ function getMaskedAnswer(answerToConvert){
 	return maskedAnswer;
 
 }
-function getQuestionPool(answerPool){
+//creates our "questions" by pulling from three pools
+//bummer is that the pools indexes need to be related i.e. index 0 should all relate to the same question
+function getQuestionPool(answerPool, imagePool, hintPool){
 	var questionPool = [];
 	for(var i = 0; i < answerPool.length; i++){		
 		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
@@ -48,36 +51,56 @@ function getQuestionPool(answerPool){
 
 		return questionPool;
 }
+
 //Called when user presses "Play Game" button on page
 function gameStart(){
 		playGame = true;
 		console.log("play game!");			
 		mainContentRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
-		questionPool = getQuestionPool(answerPool);
+		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
 		currentQuestion = nextQuestion();
 }
 
+//Sets the HTML elements to display Question data
+function displayQuestionHtml(imageURL,hintText,maskedAnswer){
+	currentHintImage.src = "./assets/images/" + imageURL;
+	currentHintText.textContent = hintText;	
+	currentMaskedText.textContent = maskedAnswer;
+}
 
-function nextQuestion(){
+//used to update maskedAnswer that displays on page whenever the selection is correct
+function updateMaskedAnswerElement(maskedAnswer){
+
+	currentMaskedText.textContent = maskedAnswer;
+}
+
+//After the questionPool is empty (after a full round), regenerate the pool with randomly ordered questions
+//Choose the next currentQuestion and remove it from the questionPool
+//If it is the first game of the session, simply select a question from the pool and display related data and remove from pool
+function nextQuestion(currentQuestion){
 
 	if(questionPool.length < 1){
-		console.log("regen pool");
-		questionPool = getQuestionPool(answerPool);
+
+		console.log("Regenerate questionPool");
+		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
+		currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
+
+	}
+	//This is used only for gameStart at the first game of the session
+	else
+	{
+
+		currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
 		
 	}
 
-	numRemainingGuesses = 3; //3 guesses for quick testing
+	numRemainingGuesses = 3;
 	correctGuessArray = [];
 	incorrectGuessArray = [];
-	var currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
-	questionPool.splice(questionPool.indexOf(currentQuestion),1); //remove the current question from the question pool to prevent dupes
-	console.log("QUESTIONS LENGTH IN NEXT QUESTION: " + questionPool.length);
-	//Show values of current question
-	//Clean up later
-	currentHintText.textContent = currentQuestion.hintText;
-	currentHintImage.src = currentQuestion.imageURL;
-	currentMaskedText.textContent = currentQuestion.maskedAnswer;
+	displayQuestionHtml(currentQuestion.imageURL,currentQuestion.hintText,currentQuestion.maskedAnswer);
+	//remove current question from Pool to prevent dupes within the round
+	questionPool.splice(questionPool.indexOf(currentQuestion),1); 
 
 	return currentQuestion;
 }
@@ -89,9 +112,6 @@ if(playGame){
 
 var selection = String(event.key).toLowerCase();
 
-
-
-
   if(currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection)){
 
 	for(var k = 0; k < currentQuestion.answer.length; k++){
@@ -101,31 +121,23 @@ var selection = String(event.key).toLowerCase();
 			currentQuestion.maskedAnswer[k] = selection;
 
 		}
-		//LOL below was unnecessary but sure looks nice. This for loop does the same.
-		//Unnecssary because we're already looping through for every element. Don't know which would be faster, but for loop easier to read
-			//currentQuestion.maskedAnswer[(currentQuestion.answer.indexOf(selection, k))] = selection; 
-				//Finds the next instance of selection by using the iterator k as an index offset which is inclusive of index[k]
-				//Replaces underscores within masked_array by finding the location of selection within currentQuestion.answer string 	
+		
 	 }
-
-	correctGuessArray.push(selection);	
 	console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
  	console.log("Masked answer: " + currentQuestion.maskedAnswer);
-
+	correctGuessArray.push(selection);	
+	
  	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
 
  		console.log("YOU WIN!");
- 		currentQuestion = nextQuestion();
+ 		currentQuestion = nextQuestion(currentQuestion);
  	}
- 		//Show update value of current question
- 		//Maybe roll this and the above if statement into a function
- 		currentMaskedText.textContent = currentQuestion.maskedAnswer;
+ 		
+ 		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
  }
- else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
- 	console.log("DUPE GUESS: " + selection);
- }
+ 
 
-else
+else if(!currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection))
  {
  	incorrectGuessArray.push(selection);
  	console.log("NOT FOUND: " + selection);
@@ -133,38 +145,14 @@ else
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
  		console.log("The answer was: " + currentQuestion.answer);
- 		currentQuestion = nextQuestion();
+ 		currentQuestion = nextQuestion(currentQuestion);
  	}
+ }
+ else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
+ 	console.log("DUPE GUESS: " + selection);
+ }
+ else{
+ 	console.log("SOMETHING WENT WRONG...");
  }
 }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
