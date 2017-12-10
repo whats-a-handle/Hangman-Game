@@ -45,6 +45,16 @@ label{
 	background-color:none;
 }
 
+.list-inline.previous-guess-list.text-center>li{
+
+	margin-right:10px;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+
+
+
 .hint-title{
 	color:yellow;
 }
