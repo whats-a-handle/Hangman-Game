@@ -19,12 +19,17 @@ var correctGuessArray = [];
 var incorrectGuessArray = [];
 var playGame = false;
 var questionPool = [];
-var win = false;
+var winCount = 0;
+var loseCount = 0 ;
 var numRemainingGuesses = 3;
 var currentQuestion;
 
+//only need the first element for this 
 var mainContentRow = document.getElementsByClassName("main-row")[0];
 var playQuitButton = document.getElementsByClassName("play-button")[0];
+var scoreRow = document.getElementsByClassName("score-row")[0];
+var currentWinCountElement = document.getElementsByClassName("win-count")[0];
+var currentLoseCountElement = document.getElementsByClassName("lose-count")[0];
 var currentHintImage = document.getElementsByClassName("hint-image")[0];
 var currentHintText = document.getElementsByClassName("hint-text")[0];
 var currentMaskedText = document.getElementsByClassName("masked-text")[0];
@@ -52,12 +57,16 @@ function getQuestionPool(answerPool, imagePool, hintPool){
 		return questionPool;
 }
 
+
 //Called when user presses "Play Game" button on page
 function gameStart(){
 		playGame = true;
-		console.log("play game!");			
+		console.log("play game!");	
+
 		mainContentRow.style.visibility = "visible";
+		scoreRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
+
 		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
 		currentQuestion = nextQuestion();
 }
@@ -66,18 +75,19 @@ function gameStart(){
 function displayQuestionHtml(imageURL,hintText,maskedAnswer){
 	currentHintImage.src = "./assets/images/" + imageURL;
 	currentHintText.textContent = hintText;	
-	currentMaskedText.textContent = maskedAnswer;
+	updateMaskedAnswerElement(maskedAnswer);
 }
 
 //used to update maskedAnswer that displays on page whenever the selection is correct
 function updateMaskedAnswerElement(maskedAnswer){
-
+	
 	currentMaskedText.textContent = maskedAnswer;
 }
 
 //After the questionPool is empty (after a full round), regenerate the pool with randomly ordered questions
 //Choose the next currentQuestion and remove it from the questionPool
 //If it is the first game of the session, simply select a question from the pool and display related data and remove from pool
+
 function nextQuestion(currentQuestion){
 
 	if(questionPool.length < 1){
@@ -99,13 +109,24 @@ function nextQuestion(currentQuestion){
 	correctGuessArray = [];
 	incorrectGuessArray = [];
 	displayQuestionHtml(currentQuestion.imageURL,currentQuestion.hintText,currentQuestion.maskedAnswer);
+	
 	//remove current question from Pool to prevent dupes within the round
 	questionPool.splice(questionPool.indexOf(currentQuestion),1); 
 
 	return currentQuestion;
 }
 
+function updateWinElement(winCount){
+	currentWinCountElement.textContent =  "WINS: " + String(winCount);
+
+}
+function updateLoseElement(loseCount){
+
+	currentLoseCountElement.textContent = "LOSSES: " + String(loseCount);
+
+}
 //Actually do stuff
+//Need to organize this stuff because it's super messy...
 document.onkeypress = function(){
 
 if(playGame){
@@ -126,17 +147,20 @@ var selection = String(event.key).toLowerCase();
 	console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
  	console.log("Masked answer: " + currentQuestion.maskedAnswer);
 	correctGuessArray.push(selection);	
-	
+	//Check if we won
  	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
 
  		console.log("YOU WIN!");
+ 		
+ 		
+ 		updateWinElement(++winCount);
  		currentQuestion = nextQuestion(currentQuestion);
  	}
  		
  		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
  }
  
-
+ 
 else if(!currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection))
  {
  	incorrectGuessArray.push(selection);
@@ -145,6 +169,8 @@ else if(!currentQuestion.answer.includes(selection) && !correctGuessArray.includ
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
  		console.log("The answer was: " + currentQuestion.answer);
+ 		
+ 		updateLoseElement(++loseCount);
  		currentQuestion = nextQuestion(currentQuestion);
  	}
  }
