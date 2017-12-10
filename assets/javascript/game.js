@@ -7,8 +7,9 @@ this.answer = answer;
 this.maskedAnswer = getMaskedAnswer(answer);
 };
 
-var answerPool = ["binturong","platypus","wombat","tanuki"];
-var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate", "Totally Not a Raccoon"];
+var answerPool = ["binturong","platypus","wombat","tanuki","lynx", "goose", "swallow"];
+var hintPool = ["Lives in SE Asia", "Duck-beaver", "Australia, Mate", "Totally not a raccoon", 
+				"Think Garfield except different", "Don't be silly", "African or European?"];
 
 var previousChoices = [];
 var playGame = false;
