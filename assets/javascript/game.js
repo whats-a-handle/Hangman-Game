@@ -15,8 +15,7 @@ this.answer = answer;
 this.maskedAnswer = getMaskedAnswer(answer);
 };
 
-var correctGuessArray = [];
-var incorrectGuessArray = [];
+var previousChoices = [];
 var playGame = false;
 var questionPool = [];
 var winCount = 0;
@@ -48,27 +47,15 @@ function getMaskedAnswer(answerToConvert){
 //creates our "questions" by pulling from three pools
 //bummer is that the pools indexes need to be related i.e. index 0 should all relate to the same question
 function getQuestionPool(answerPool, imagePool, hintPool){
+
 	var questionPool = [];
-	for(var i = 0; i < answerPool.length; i++){		
-		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i]));
+	for(var i = 0; i < answerPool.length; i++){	
+			
+		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i].toUpperCase()));
 		}
 		console.log(questionPool);
 
 		return questionPool;
-}
-
-
-//Called when user presses "Play Game" button on page
-function gameStart(){
-		playGame = true;
-		console.log("play game!");	
-
-		mainContentRow.style.visibility = "visible";
-		scoreRow.style.visibility = "visible";
-		playQuitButton.style.visibility = "hidden";
-
-		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
-		currentQuestion = nextQuestion();
 }
 
 //Sets the HTML elements to display Question data
@@ -106,8 +93,8 @@ function nextQuestion(currentQuestion){
 	}
 
 	numRemainingGuesses = 3;
-	correctGuessArray = [];
-	incorrectGuessArray = [];
+	previousChoices = [];
+	
 	displayQuestionHtml(currentQuestion.imageURL,currentQuestion.hintText,currentQuestion.maskedAnswer);
 	
 	//remove current question from Pool to prevent dupes within the round
@@ -125,15 +112,33 @@ function updateLoseElement(loseCount){
 	currentLoseCountElement.textContent = "LOSSES: " + String(loseCount);
 
 }
+function displayPreviousChoices(){};
+
+//Called when user presses "Play Game" button on page
+
+function gameStart(){
+		playGame = true;
+		console.log("play game!");	
+
+		mainContentRow.style.visibility = "visible";
+		scoreRow.style.visibility = "visible";
+		playQuitButton.style.visibility = "hidden";
+
+		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
+		currentQuestion = nextQuestion();
+}
+
+
+////MAIN///////////////////////////////////////////////////////////////////////
 //Actually do stuff
 //Need to organize this stuff because it's super messy...
 document.onkeypress = function(){
 
 if(playGame){
 
-var selection = String(event.key).toLowerCase();
+var selection = String(event.key).toUpperCase();
 
-  if(currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection)){
+  if(currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
 
 	for(var k = 0; k < currentQuestion.answer.length; k++){
 
@@ -144,9 +149,9 @@ var selection = String(event.key).toLowerCase();
 		}
 		
 	 }
-	console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
- 	console.log("Masked answer: " + currentQuestion.maskedAnswer);
-	correctGuessArray.push(selection);	
+	//console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
+ 	//console.log("Masked answer: " + currentQuestion.maskedAnswer);
+	previousChoices.push(selection);	
 	//Check if we won
  	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
 
@@ -161,10 +166,10 @@ var selection = String(event.key).toLowerCase();
  }
  
  
-else if(!currentQuestion.answer.includes(selection) && !correctGuessArray.includes(selection) && !incorrectGuessArray.includes(selection))
+else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes(selection))
  {
- 	incorrectGuessArray.push(selection);
- 	console.log("NOT FOUND: " + selection);
+ 	previousChoices.push(selection);
+ 	//console.log("NOT FOUND: " + selection);
  	numRemainingGuesses--;
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
@@ -174,7 +179,7 @@ else if(!currentQuestion.answer.includes(selection) && !correctGuessArray.includ
  		currentQuestion = nextQuestion(currentQuestion);
  	}
  }
- else if(correctGuessArray.includes(selection) || incorrectGuessArray.includes(selection)){
+ else if(previousChoices.includes(selection)){
  	console.log("DUPE GUESS: " + selection);
  }
  else{
