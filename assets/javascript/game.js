@@ -1,19 +1,14 @@
-  
-console.log("hello!");
 
 
 
-
-var answerPool = ["binturong","platypus","wombat"];
-var imagePool = ["binturong.jpg","platypus.jpg", "wombat.jpg"];
-var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate"];
-
-var Question = function(imageUrl,hintText,answer){
-this.imageURL = imageUrl;
+var Question = function(hintText,answer){
 this.hintText = hintText;
 this.answer = answer;
 this.maskedAnswer = getMaskedAnswer(answer);
 };
+
+var answerPool = ["binturong","platypus","wombat","tanuki"];
+var hintPool = ["Lives in SE Asia", "Duck Beaver", "Australia Mate", "Totally Not a Raccoon"];
 
 var previousChoices = [];
 var playGame = false;
@@ -23,7 +18,8 @@ var loseCount = 0 ;
 var numRemainingGuesses = 5;
 var currentQuestion;
 var spacebarKey = 32;
-//only need the first element for this 
+
+//only need the first element for these
 var mainContentRow = document.getElementsByClassName("main-row")[0];
 var playQuitButton = document.getElementsByClassName("play-button")[0];
 var scoreRow = document.getElementsByClassName("score-row")[0];
@@ -49,22 +45,24 @@ function getMaskedAnswer(answerToConvert){
 }
 //creates our "questions" by pulling from three pools
 //bummer is that the pools indexes need to be related i.e. index 0 should all relate to the same question
-function getQuestionPool(answerPool, imagePool, hintPool){
 
+function getQuestionPool(answerPool, hintPool){
 	var questionPool = [];
 
 	for(var i = 0; i < answerPool.length; i++){	
 
-		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i].toUpperCase()));
+		//questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i].toUpperCase()));
+		questionPool.push(new Question(hintPool[i],answerPool[i].toUpperCase()));
 	}
 		
 	return questionPool;
 }
 
 //Sets the HTML elements to display Question data
-function displayQuestionHtml(imageURL,hintText,maskedAnswer){
 
-	currentHintImage.src = "./assets/images/" + imageURL;
+function displayQuestionHtml(answer,hintText,maskedAnswer){
+	
+	currentHintImage.src = "./assets/images/" + answer + ".jpg";
 	currentHintText.textContent = hintText;	
 	updateMaskedAnswerElement(maskedAnswer);
 
@@ -85,8 +83,7 @@ function nextQuestion(currentQuestion){//split this into a reset function and ne
 
 	if(questionPool.length < 1){
 
-		console.log("Regenerate questionPool");
-		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
+		questionPool = getQuestionPool(answerPool, hintPool);
 		currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
 		
 	}
@@ -100,7 +97,7 @@ function nextQuestion(currentQuestion){//split this into a reset function and ne
 	numRemainingGuesses = 5;
 	resetPreviousChoiceElement();
 	previousChoices = [];
-	displayQuestionHtml(currentQuestion.imageURL,currentQuestion.hintText,currentQuestion.maskedAnswer);
+	displayQuestionHtml(currentQuestion.answer,currentQuestion.hintText,currentQuestion.maskedAnswer);
 	
 	//remove current question from Pool to prevent dupes within the round
 	questionPool.splice(questionPool.indexOf(currentQuestion),1); 
@@ -144,8 +141,7 @@ function gameStart(){
 		mainContentRow.style.visibility = "visible";
 		scoreRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
-
-		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
+		questionPool = getQuestionPool(answerPool,hintPool);
 		currentQuestion = nextQuestion();
 }
 
@@ -172,7 +168,7 @@ document.onkeypress = function(){
 				}
 				
 			 }
-			 		
+
 			//Check if we won
 		 	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
 
