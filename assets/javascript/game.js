@@ -22,7 +22,7 @@ var winCount = 0;
 var loseCount = 0 ;
 var numRemainingGuesses = 5;
 var currentQuestion;
-
+var spacebarKey = 32;
 //only need the first element for this 
 var mainContentRow = document.getElementsByClassName("main-row")[0];
 var playQuitButton = document.getElementsByClassName("play-button")[0];
@@ -36,7 +36,9 @@ var currentMaskedText = document.getElementsByClassName("masked-text")[0];
 
 //"converts" our answer's length into an array of underscores for guessing
 function getMaskedAnswer(answerToConvert){
+
 	var maskedAnswer = []; 
+
 	for(var i = 0; i < answerToConvert.length;i++){
 		
 		maskedAnswer.push("_");
@@ -50,33 +52,36 @@ function getMaskedAnswer(answerToConvert){
 function getQuestionPool(answerPool, imagePool, hintPool){
 
 	var questionPool = [];
-	for(var i = 0; i < answerPool.length; i++){	
-			
-		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i].toUpperCase()));
-		}
-		console.log(questionPool);
 
-		return questionPool;
+	for(var i = 0; i < answerPool.length; i++){	
+
+		questionPool.push(new Question(imagePool[i],hintPool[i],answerPool[i].toUpperCase()));
+	}
+		
+	return questionPool;
 }
 
 //Sets the HTML elements to display Question data
 function displayQuestionHtml(imageURL,hintText,maskedAnswer){
+
 	currentHintImage.src = "./assets/images/" + imageURL;
 	currentHintText.textContent = hintText;	
 	updateMaskedAnswerElement(maskedAnswer);
+
 }
 
 //used to update maskedAnswer that displays on page whenever the selection is correct
 function updateMaskedAnswerElement(maskedAnswer){
 	
 	currentMaskedText.textContent = maskedAnswer;
+
 }
 
 //After the questionPool is empty (after a full round), regenerate the pool with randomly ordered questions
 //Choose the next currentQuestion and remove it from the questionPool
 //If it is the first game of the session, simply select a question from the pool and display related data and remove from pool
 
-function nextQuestion(currentQuestion){
+function nextQuestion(currentQuestion){//split this into a reset function and new question function
 
 	if(questionPool.length < 1){
 
@@ -122,8 +127,8 @@ function updatePreviousChoiceElement(selection){
 		previousChoiceElement.appendChild(li);
 	
 };
-//lol this prob causes mem leaks
-function resetPreviousChoiceElement(){
+
+function resetPreviousChoiceElement(){ //lol this prob causes mem leaks
 
 	while (previousChoiceElement.firstChild) {
   		previousChoiceElement.removeChild(previousChoiceElement.firstChild);
@@ -147,70 +152,57 @@ function gameStart(){
 
 ////MAIN///////////////////////////////////////////////////////////////////////
 //Actually do stuff
-//Need to organize this stuff because it's super messy...
+
 document.onkeypress = function(){
 
-if(playGame){
+	if(playGame){
 
-if(event.keyCode !== 32){
+		if(event.keyCode !== spacebarKey){ //dont want spacebars because they are lame
 
+		   var selection = String(event.key).toUpperCase();
 
-   var selection = String(event.key).toUpperCase();
+		  if(currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
 
-  if(currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
+			for(var i = 0; i < currentQuestion.answer.length; i++){
 
-	for(var i = 0; i < currentQuestion.answer.length; i++){
+				if(currentQuestion.answer[i] === selection){
 
-		if(currentQuestion.answer[i] === selection){
+					currentQuestion.maskedAnswer[i] = selection;
 
-			currentQuestion.maskedAnswer[i] = selection;
+				}
+				
+			 }
+			 		
+			//Check if we won
+		 	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
+
+		 		updateWinElement(++winCount);
+		 		currentQuestion = nextQuestion(currentQuestion);
+		 	}
+		 	else{
+		 		previousChoices.push(selection);
+		 		updatePreviousChoiceElement(selection);
+		 	}
+		 		
+		 		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
+		 		
+		 }
+		 
+		 
+		else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
+
+		 	previousChoices.push(selection);
+		 	updatePreviousChoiceElement(selection);
+		 	updateRemainingGuessElement(--numRemainingGuesses);
+
+		 	if(numRemainingGuesses < 1){
+		 		updateLoseElement(++loseCount);
+		 		currentQuestion = nextQuestion(currentQuestion);
+		 	}
+
+		 }
+
 
 		}
-		
-	 }
-	//console.log("FOUND: " + selection + " in word: " + currentQuestion.answer);
- 	//console.log("Masked answer: " + currentQuestion.maskedAnswer);
-	previousChoices.push(selection);	
-	//Check if we won
- 	if(currentQuestion.maskedAnswer.join("") === currentQuestion.answer){
-
- 		console.log("YOU WIN!");
- 		
- 		
- 		updateWinElement(++winCount);
- 		currentQuestion = nextQuestion(currentQuestion);
- 	}
- 	else{
- 		updatePreviousChoiceElement(selection);
- 	}
- 		
- 		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
- 		
- }
- 
- 
-else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes(selection))
- {
- 	previousChoices.push(selection);
- 	updatePreviousChoiceElement(selection);
- 	//console.log("NOT FOUND: " + selection);
- 	updateRemainingGuessElement(--numRemainingGuesses);
-
- 	if(numRemainingGuesses < 1){
- 		console.log("YOU LOSE!");
- 		console.log("The answer was: " + currentQuestion.answer);
- 		
- 		updateLoseElement(++loseCount);
- 		currentQuestion = nextQuestion(currentQuestion);
- 	}
-
- }
- else if(previousChoices.includes(selection)){
- 	console.log("DUPE GUESS: " + selection);
- }
- else{
- 	console.log("SOMETHING WENT WRONG...");
- }
-}
-}
+	}
 }
