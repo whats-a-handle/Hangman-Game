@@ -62,7 +62,7 @@ function getQuestionPool(answerPool, hintPool){
 
 function displayQuestionHtml(answer,hintText,maskedAnswer){
 	
-	currentHintImage.src = "./assets/images/" + answer + ".jpg";
+	currentHintImage.src = "./assets/images/" + answer.toLowerCase() + ".jpg";
 	currentHintText.textContent = hintText;	
 	updateMaskedAnswerElement(maskedAnswer);
 
