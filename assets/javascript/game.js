@@ -20,7 +20,7 @@ var playGame = false;
 var questionPool = [];
 var winCount = 0;
 var loseCount = 0 ;
-var numRemainingGuesses = 3;
+var numRemainingGuesses = 5;
 var currentQuestion;
 
 //only need the first element for this 
@@ -29,6 +29,7 @@ var playQuitButton = document.getElementsByClassName("play-button")[0];
 var scoreRow = document.getElementsByClassName("score-row")[0];
 var currentWinCountElement = document.getElementsByClassName("win-count")[0];
 var currentLoseCountElement = document.getElementsByClassName("lose-count")[0];
+var previousChoiceElement = document.getElementsByClassName("previous-guess-list")[0];
 var currentHintImage = document.getElementsByClassName("hint-image")[0];
 var currentHintText = document.getElementsByClassName("hint-text")[0];
 var currentMaskedText = document.getElementsByClassName("masked-text")[0];
@@ -36,7 +37,7 @@ var currentMaskedText = document.getElementsByClassName("masked-text")[0];
 //"converts" our answer's length into an array of underscores for guessing
 function getMaskedAnswer(answerToConvert){
 	var maskedAnswer = []; 
-	for(var q = 0; q < answerToConvert.length;q++){
+	for(var i = 0; i < answerToConvert.length;i++){
 		
 		maskedAnswer.push("_");
 	}
@@ -82,19 +83,18 @@ function nextQuestion(currentQuestion){
 		console.log("Regenerate questionPool");
 		questionPool = getQuestionPool(answerPool, imagePool, hintPool);
 		currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
-
+		
 	}
 	//This is used only for gameStart at the first game of the session
 	else
 	{
-
 		currentQuestion = questionPool[Math.floor(Math.random()*questionPool.length)];
-		
+		resetPreviousChoiceElement();
 	}
 
-	numRemainingGuesses = 3;
+	numRemainingGuesses = 5;
+	resetPreviousChoiceElement();
 	previousChoices = [];
-	
 	displayQuestionHtml(currentQuestion.imageURL,currentQuestion.hintText,currentQuestion.maskedAnswer);
 	
 	//remove current question from Pool to prevent dupes within the round
@@ -112,7 +112,23 @@ function updateLoseElement(loseCount){
 	currentLoseCountElement.textContent = "LOSSES: " + String(loseCount);
 
 }
-function displayPreviousChoices(){};
+function updateRemainingGuessElement(numRemainingGuesses){
+	//currentGuessCountElement.textContent = "GUESSES REMAINING: " + String(numRemainingGuesses);
+}
+function updatePreviousChoiceElement(selection){
+
+		var li = document.createElement("li");
+		li.textContent = selection
+		previousChoiceElement.appendChild(li);
+	
+};
+//lol this prob causes mem leaks
+function resetPreviousChoiceElement(){
+
+	while (previousChoiceElement.firstChild) {
+  		previousChoiceElement.removeChild(previousChoiceElement.firstChild);
+	}
+}
 
 //Called when user presses "Play Game" button on page
 
@@ -136,15 +152,18 @@ document.onkeypress = function(){
 
 if(playGame){
 
-var selection = String(event.key).toUpperCase();
+if(event.keyCode !== 32){
+
+
+   var selection = String(event.key).toUpperCase();
 
   if(currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
 
-	for(var k = 0; k < currentQuestion.answer.length; k++){
+	for(var i = 0; i < currentQuestion.answer.length; i++){
 
-		if(currentQuestion.answer[k] === selection){
+		if(currentQuestion.answer[i] === selection){
 
-			currentQuestion.maskedAnswer[k] = selection;
+			currentQuestion.maskedAnswer[i] = selection;
 
 		}
 		
@@ -161,16 +180,22 @@ var selection = String(event.key).toUpperCase();
  		updateWinElement(++winCount);
  		currentQuestion = nextQuestion(currentQuestion);
  	}
+ 	else{
+ 		updatePreviousChoiceElement(selection);
+ 	}
  		
  		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
+ 		
  }
  
  
 else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes(selection))
  {
  	previousChoices.push(selection);
+ 	updatePreviousChoiceElement(selection);
  	//console.log("NOT FOUND: " + selection);
- 	numRemainingGuesses--;
+ 	updateRemainingGuessElement(--numRemainingGuesses);
+
  	if(numRemainingGuesses < 1){
  		console.log("YOU LOSE!");
  		console.log("The answer was: " + currentQuestion.answer);
@@ -178,6 +203,7 @@ else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes
  		updateLoseElement(++loseCount);
  		currentQuestion = nextQuestion(currentQuestion);
  	}
+
  }
  else if(previousChoices.includes(selection)){
  	console.log("DUPE GUESS: " + selection);
@@ -185,5 +211,6 @@ else if(!currentQuestion.answer.includes(selection) && !previousChoices.includes
  else{
  	console.log("SOMETHING WENT WRONG...");
  }
+}
 }
 }
