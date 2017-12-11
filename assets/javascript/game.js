@@ -69,7 +69,7 @@ function displayQuestionHtml(answer,hintText,maskedAnswer){
 	//updateMaskedAnswerElement(maskedAnswer);
 		//resetMaskedAnswerElement(maskedAnswer);
 		resetMaskedAnswerElement();
-		updateMaskedAnswerElementTwo(maskedAnswer);
+		updateMaskedAnswerElement(maskedAnswer);
 }
 
 
@@ -130,7 +130,7 @@ function resetMaskedAnswerElement(){
   		currentMaskedTextElement.removeChild(currentMaskedTextElement.firstChild);
 	}
 }
-function updateMaskedAnswerElementTwo(maskedAnswer){
+function updateMaskedAnswerElement(maskedAnswer){
 		resetMaskedAnswerElement();
 		for(var i = 0; i < maskedAnswer.length; i++){
 
@@ -198,7 +198,7 @@ document.onkeyup = function(){
 		 		updatePreviousChoiceElement(selection);
 		 	}
 		 		
-		 		updateMaskedAnswerElementTwo(currentQuestion.maskedAnswer);
+		 		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
 		 		
 		 }
 		 
