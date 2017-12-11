@@ -24,6 +24,7 @@
 		</div>
 		<div class="col-sm-4 score-container text-center">
 			<span> <h3 class="score-text guess-count">GUESSES REMAINING: </h3></span>
+			<span> <h3 class="score-text"> Dupe Guesses Don't Count</h3></span>
 
 		</div>
 		<div class="col-sm-4 score-container text-center">
@@ -51,11 +52,14 @@
 				
 				<span class="hint-container text-center">
 					<!--should be dynamic-->
+
 					<h2 class="hint-title">HINT:</h2>
 					<h2 class="hint-text"></h2>
 				</span>
 				<span class="masked-container text-center">
-				<h2 class="masked-text"></h2> <!--placeholder.... this will be an array-->
+					<ul class="masked-text-list list-inline">
+					</ul>
+				<!--<h2 class="masked-text"></h2> --><!--placeholder.... this will be an array-->
 			</span>
 
 
@@ -86,6 +90,7 @@
 
 </footer>
 <!--/.Footer-->
-</body>
 <script src="./assets/javascript/game.js"></script>
+</body>
+
 </html>
