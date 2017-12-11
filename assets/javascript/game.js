@@ -26,6 +26,7 @@ var playQuitButton = document.getElementsByClassName("play-button")[0];
 var scoreRow = document.getElementsByClassName("score-row")[0];
 var currentWinCountElement = document.getElementsByClassName("win-count")[0];
 var currentLoseCountElement = document.getElementsByClassName("lose-count")[0];
+var currentGuessCountElement = document.getElementsByClassName("guess-count")[0];
 var previousChoiceElement = document.getElementsByClassName("previous-guess-list")[0];
 var currentHintImage = document.getElementsByClassName("hint-image")[0];
 var currentHintText = document.getElementsByClassName("hint-text")[0];
@@ -97,6 +98,7 @@ function nextQuestion(currentQuestion){//split this into a reset function and ne
 
 	numRemainingGuesses = 5;
 	resetPreviousChoiceElement();
+	updateRemainingGuessElement(numRemainingGuesses);
 	previousChoices = [];
 	displayQuestionHtml(currentQuestion.answer,currentQuestion.hintText,currentQuestion.maskedAnswer);
 	
@@ -116,7 +118,7 @@ function updateLoseElement(loseCount){
 
 }
 function updateRemainingGuessElement(numRemainingGuesses){
-	//currentGuessCountElement.textContent = "GUESSES REMAINING: " + String(numRemainingGuesses);
+	currentGuessCountElement.textContent = "GUESSES REMAINING: " + String(numRemainingGuesses);
 }
 function updatePreviousChoiceElement(selection){
 
@@ -149,7 +151,7 @@ function gameStart(){
 
 ////MAIN///////////////////////////////////////////////////////////////////////
 //Actually do stuff
-
+//probably should have a function to check the input and also move this stuff into a more organized format
 document.onkeypress = function(){
 
 	if(playGame){
