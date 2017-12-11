@@ -153,8 +153,6 @@ function resetPreviousChoiceElement(){ //lol this prob causes mem leaks
 
 function gameStart(){
 		playGame = true;
-		console.log("play game!");	
-
 		mainContentRow.style.visibility = "visible";
 		scoreRow.style.visibility = "visible";
 		playQuitButton.style.visibility = "hidden";
