@@ -30,7 +30,7 @@ var currentGuessCountElement = document.getElementsByClassName("guess-count")[0]
 var previousChoiceElement = document.getElementsByClassName("previous-guess-list")[0];
 var currentHintImage = document.getElementsByClassName("hint-image")[0];
 var currentHintText = document.getElementsByClassName("hint-text")[0];
-var currentMaskedText = document.getElementsByClassName("masked-text")[0];
+var currentMaskedTextElement = document.getElementsByClassName("masked-text-list")[0];
 
 //"converts" our answer's length into an array of underscores for guessing
 function getMaskedAnswer(answerToConvert){
@@ -66,16 +66,12 @@ function displayQuestionHtml(answer,hintText,maskedAnswer){
 	
 	currentHintImage.src = "./assets/images/" + answer.toLowerCase() + ".jpg";
 	currentHintText.textContent = hintText;	
-	updateMaskedAnswerElement(maskedAnswer);
-
+	//updateMaskedAnswerElement(maskedAnswer);
+		//resetMaskedAnswerElement(maskedAnswer);
+		resetMaskedAnswerElement();
+		updateMaskedAnswerElementTwo(maskedAnswer);
 }
 
-//used to update maskedAnswer that displays on page whenever the selection is correct
-function updateMaskedAnswerElement(maskedAnswer){
-	
-	currentMaskedText.textContent = maskedAnswer;
-
-}
 
 //After the questionPool is empty (after a full round), regenerate the pool with randomly ordered questions
 //Choose the next currentQuestion and remove it from the questionPool
@@ -98,6 +94,7 @@ function nextQuestion(currentQuestion){//split this into a reset function and ne
 
 	numRemainingGuesses = 5;
 	resetPreviousChoiceElement();
+	
 	updateRemainingGuessElement(numRemainingGuesses);
 	previousChoices = [];
 	displayQuestionHtml(currentQuestion.answer,currentQuestion.hintText,currentQuestion.maskedAnswer);
@@ -128,6 +125,23 @@ function updatePreviousChoiceElement(selection){
 	
 };
 
+function resetMaskedAnswerElement(){
+	while (currentMaskedTextElement.firstChild) {
+  		currentMaskedTextElement.removeChild(currentMaskedTextElement.firstChild);
+	}
+}
+function updateMaskedAnswerElementTwo(maskedAnswer){
+		resetMaskedAnswerElement();
+		for(var i = 0; i < maskedAnswer.length; i++){
+
+			var li = document.createElement("li");
+			li.textContent = maskedAnswer[i];
+			currentMaskedTextElement.appendChild(li);
+
+		}
+	
+};
+
 function resetPreviousChoiceElement(){ //lol this prob causes mem leaks
 
 	while (previousChoiceElement.firstChild) {
@@ -152,13 +166,16 @@ function gameStart(){
 ////MAIN///////////////////////////////////////////////////////////////////////
 //Actually do stuff
 //probably should have a function to check the input and also move this stuff into a more organized format
-document.onkeypress = function(){
+//onkeyup/onkeypress etc don't work in firefox since it's not supported
+
+
+document.onkeyup = function(){
 
 	if(playGame){
 
 		if(event.keyCode !== spacebarKey){ //dont want spacebars because they are lame
 
-		   var selection = String(event.key).toUpperCase();
+		  var selection = String(event.key).toUpperCase();
 
 		  if(currentQuestion.answer.includes(selection) && !previousChoices.includes(selection)){
 
@@ -183,7 +200,7 @@ document.onkeypress = function(){
 		 		updatePreviousChoiceElement(selection);
 		 	}
 		 		
-		 		updateMaskedAnswerElement(currentQuestion.maskedAnswer);
+		 		updateMaskedAnswerElementTwo(currentQuestion.maskedAnswer);
 		 		
 		 }
 		 
